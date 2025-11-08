@@ -1,0 +1,73 @@
+* {
+  /* padding: 5px;
+  margin: 5px; */
+  box-sizing: border-box;
+  /* border: 1px solid red; */
+}
+html {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+body {
+  background-color: #b1b1b1;
+  margin-top: 50px;
+}
+main {
+  border: 5px solid #ff7b34;
+  background-color: #322f2f;
+  width: 550px;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 20px;
+}
+main > * {
+  flex-grow: 1;
+}
+#display {
+  font-size: 60px;
+  margin: 10px;
+  border-radius: 4px;
+  border-radius: 20px;
+  padding: 10px;
+}
+.buttons {
+  display: flex;
+  margin-top: 20px;
+}
+.buttons > * {
+  flex-grow: 1;
+}
+button {
+  padding: 5px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 34px;
+  font-weight: bold;
+  font-family: monospace;
+  color: #3a3939;
+}
+.digits {
+  display: flex;
+  flex-direction: column;
+}
+.operators {
+  display: flex;
+  flex-direction: column;
+}
+.row {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  flex-grow: 1;
+}
+.row > * {
+  flex-grow: 1;
+  margin: 10px;
+}
+.equality {
+  background-color: #ff7b34;
+  color: white;
+}
