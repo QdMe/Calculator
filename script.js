@@ -1,6 +1,5 @@
 let num1 = 0;
 let num2 = 0;
-let operator;
 function add(a, b) {
   return a + b;
 }
@@ -31,44 +30,115 @@ const input = document.querySelector("#display");
 const btns = document.querySelectorAll("button");
 
 btns.forEach((btn) => btn.addEventListener("click", displayResult));
-let arr1 = [];
-let arr2 = [];
 
-let sign;
+let arr = [];
+let i = 0;
+let start = false;
 let result;
+let sign;
+let previousSign;
+let previousBtn;
 function displayResult(e) {
-  // Get num1
-  if (!isOperator(e) && !isdelOrEqualOrC(e) && sign == undefined) {
-    arr1.push(e.target.textContent);
-    num1 = input.value = arr1.join("");
-  } else if (isOperator(e) && !isdelOrEqualOrC(e)) {
-    // Get Operation
-    sign = e.target.textContent;
-  } else {
-    // Get num2
-    if (!isOperator(e) && !isdelOrEqualOrC(e)) {
-      arr2.push(e.target.textContent);
-      if (result == undefined) {
-        input.value = arr2.join("");
+  let btn = e.target.textContent;
+  switch (true) {
+    case isDigit(e):
+      if (btn == "0" && start == false) {
+        break;
+      } else if (arr[i] == undefined) {
+        arr[i] = [];
       }
-      num2 = arr2[0];
 
-      // Calculate result
-    } else if (e.target.textContent == "=" && result == undefined) {
-      result = operate(sign, +num1, +num2);
-      input.value = result;
-      arr2 = [];
-    } else if (e.target.textContent == "=") {
-      // Take this operator
-      // Wait for anothr digit to be entered
-      input.value = operate(sign, result, num2);
-    }
+      if (previousBtn == "=") {
+        arr[0] = [];
+        arr[1] = [];
+      }
+      if (result != undefined && arr[i] == undefined) {
+        arr[i] = [];
+      }
+      if (previousBtn == undefined) {
+        previousBtn = btn;
+      }
+      if (previousBtn == sign) {
+        arr[i] = [];
+      }
+
+      // if (i == 1 && result != undefined) {
+      //   arr[i] = [];
+      // }
+      arr[i].push(btn);
+      input.value = arr[i].join("");
+      start = true;
+      break;
+
+    case isOperator(e):
+      if (i >= 0 && start == true) {
+        sign = btn;
+        if (arr[i] != undefined) i++;
+      }
+      if (previousSign == undefined) {
+        previousSign = sign;
+      }
+      if (Operator(previousBtn)) {
+        i--;
+        break;
+      }
+
+      if (i > 1) {
+        num1 = +arr[0].join("");
+        if (typeof arr[1] == "object") {
+          num2 = +arr[1].join("");
+        } else num2 = +arr[1];
+        result = operate(previousSign, num1, num2);
+        if (result == Infinity) {
+          input.value = "Good shot bayaa";
+        } else {
+          input.value = result;
+        }
+        arr[0] = [`${result}`];
+        i = 1;
+      }
+      previousSign = btn;
+
+      break;
+
+    case isEqual(e):
+      num1 = +arr[0].join("");
+      if (typeof arr[1] == "object") {
+        num2 = +arr[1].join("");
+      } else num2 = +arr[1];
+      console.log(typeof arr[1]);
+      result = operate(sign, num1, num2);
+      if (result == Infinity) {
+        input.value = "Good shot bayaa";
+      } else {
+        input.value = result;
+        arr[0] = [`${result}`];
+        i = 0;
+      }
+      break;
+
+    case isClear(e):
+      i = 0;
+      input.value = 0;
+      start = false;
+      result = undefined;
+      for (let i = 0; i < arr.length; i++) {
+        arr[i] = undefined;
+      }
+      break;
+
+    default:
   }
-
-  // Show result after pressing a digit after a calculation was performed previousely
-  // if()
+  previousBtn = btn;
 }
-
+function Operator(btn) {
+  let operators = ["+", "-", "/", "x"];
+  return operators.includes(btn);
+}
+function isDigit(e) {
+  let digit = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  return digit.includes(+e.target.textContent);
+}
 function isOperator(e) {
   let target = e.target.textContent;
   if (target == "x" || target == "/" || target == "-" || target == "+") {
@@ -77,15 +147,22 @@ function isOperator(e) {
     return false;
   }
 }
-function isdelOrEqualOrC(e) {
+function isEqual(e) {
   let target = e.target.textContent;
-  if (target == "Del" || target == "=" || target == "C" || target == ".") {
+  if (target == "=") {
     return true;
   } else {
     return false;
   }
 }
-
+function isClear(e) {
+  let target = e.target.textContent;
+  if (target == "C" || target == "Del" || target == ".") {
+    return true;
+  } else {
+    return false;
+  }
+}
 // 1- press any digit
 // 2- display digit
 // 3- press an operator
