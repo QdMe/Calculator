@@ -27,7 +27,7 @@ main > * {
   flex-grow: 1;
 }
 #display {
-  font-size: 60px;
+  font-size: 50px;
   margin: 10px;
   border-radius: 4px;
   border-radius: 20px;
@@ -70,4 +70,7 @@ button {
 .equality {
   background-color: #ff7b34;
   color: white;
+}
+.click {
+  background-color: #525252;
 }

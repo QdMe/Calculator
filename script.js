@@ -1,5 +1,3 @@
-let num1 = 0;
-let num2 = 0;
 function add(a, b) {
   return a + b;
 }
@@ -30,91 +28,115 @@ const input = document.querySelector("#display");
 const btns = document.querySelectorAll("button");
 
 btns.forEach((btn) => btn.addEventListener("click", displayResult));
+btns.forEach((btn) =>
+  btn.addEventListener("click", function (e) {
+    e.target.classList.add("click");
+    setTimeout(() => this.classList.remove("click"), 120);
+  })
+);
 
 let arr = [];
+let num1 = arr[0];
+let num2 = arr[1];
 let i = 0;
 let start = false;
 let result;
-let sign;
+let currSign;
 let previousSign;
 let previousBtn;
+let currBtn;
+
 function displayResult(e) {
   let btn = e.target.textContent;
   switch (true) {
     case isDigit(e):
+      // Check if "0" is entered in a clean screen so it's not registered
       if (btn == "0" && start == false) {
         break;
-      } else if (arr[i] == undefined) {
-        arr[i] = [];
+      } else if (num1 == undefined) {
+        num1 = [];
+        currBtn = "num1";
       }
 
-      if (previousBtn == "=") {
-        arr[0] = [];
-        arr[1] = [];
-      }
-      if (result != undefined && arr[i] == undefined) {
-        arr[i] = [];
-      }
       if (previousBtn == undefined) {
         previousBtn = btn;
       }
-      if (previousBtn == sign) {
-        arr[i] = [];
+
+      // Check if a digit is entred after a calculation was performed using the = sign to clear old results
+      if (previousBtn == "=") {
+        num1 = [];
+        num2 = [];
       }
 
-      // if (i == 1 && result != undefined) {
+      // if (result != undefined && arr[i] == undefined) {
       //   arr[i] = [];
       // }
-      arr[i].push(btn);
-      input.value = arr[i].join("");
-      start = true;
-      break;
 
-    case isOperator(e):
-      if (i >= 0 && start == true) {
-        sign = btn;
-        if (arr[i] != undefined) i++;
+      if (previousBtn == currSign) {
+        num2 = [];
       }
-      if (previousSign == undefined) {
-        previousSign = sign;
-      }
-      if (Operator(previousBtn)) {
-        i--;
+      if (currBtn == "num1") {
+        num1.push(btn);
+        input.value = num1.join("");
+        start = true;
+        break;
+      } else {
+        num2.push(btn);
+        input.value = num2.join("");
+        start = true;
         break;
       }
 
+    case isOperator(e):
+      if (start == true) {
+        currSign = btn;
+        if (num1 != undefined) i++;
+      }
+      if (previousSign == undefined) {
+        previousSign = currSign;
+      }
+      if (currBtn == "num1") {
+        currBtn = "num2";
+      } else {
+        currBtn = "num1";
+      }
       if (i > 1) {
-        num1 = +arr[0].join("");
-        if (typeof arr[1] == "object") {
-          num2 = +arr[1].join("");
-        } else num2 = +arr[1];
+        if (Operator(previousBtn)) {
+          i--;
+          break;
+        }
+        num1 = +num1.join("");
+        if (typeof num2 == "object") {
+          num2 = +num2.join("");
+        } else num2 = +num2;
         result = operate(previousSign, num1, num2);
         if (result == Infinity) {
-          input.value = "Good shot bayaa";
+          input.value = "Wrong number bitch";
         } else {
           input.value = result;
         }
-        arr[0] = [`${result}`];
+        num1 = [`${result}`];
+        currBtn = "num2";
         i = 1;
       }
-      previousSign = btn;
 
+      previousSign = btn;
       break;
 
     case isEqual(e):
-      num1 = +arr[0].join("");
-      if (typeof arr[1] == "object") {
-        num2 = +arr[1].join("");
-      } else num2 = +arr[1];
-      console.log(typeof arr[1]);
-      result = operate(sign, num1, num2);
+      num1 = +num1.join("");
+      if (typeof num2 == "object") {
+        num2 = +num2.join("");
+      } else num2 = +num2;
+      result = operate(currSign, num1, num2);
       if (result == Infinity) {
-        input.value = "Good shot bayaa";
+        input.value = "Wrong number bitch";
       } else {
         input.value = result;
-        arr[0] = [`${result}`];
+        num1 = [`${result}`];
         i = 0;
       }
+      currBtn = "num1";
       break;
 
     case isClear(e):
