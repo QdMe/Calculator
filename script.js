@@ -44,7 +44,7 @@ let result;
 let currSign;
 let previousSign;
 let previousBtn;
-let currBtn;
+let currOperand;
 
 function displayResult(e) {
   let btn = e.target.textContent;
@@ -53,90 +53,117 @@ function displayResult(e) {
       // Check if "0" is entered in a clean screen so it's not registered
       if (btn == "0" && start == false) {
         break;
+        // Clear the first opearnd and Set the currOperand
       } else if (num1 == undefined) {
         num1 = [];
-        currBtn = "num1";
+        currOperand = "num1";
       }
 
+      // Save the previousBtn
       if (previousBtn == undefined) {
         previousBtn = btn;
       }
 
       // Check if a digit is entred after a calculation was performed using the = sign to clear old results
-      if (previousBtn == "=") {
+      if (previousBtn == "=" && num2 != undefined) {
         num1 = [];
         num2 = [];
+        currSign = undefined;
       }
-
-      // if (result != undefined && arr[i] == undefined) {
-      //   arr[i] = [];
-      // }
-
+      // Reset the second operand if a digit is entered right after a sign was entered
       if (previousBtn == currSign) {
         num2 = [];
       }
-      if (currBtn == "num1") {
+      // Displaying the digits depending on the value of the currOperand
+      if (currOperand == "num1") {
         num1.push(btn);
         input.value = num1.join("");
-        start = true;
-        break;
       } else {
         num2.push(btn);
         input.value = num2.join("");
-        start = true;
-        break;
       }
+      // To allow non digit values to be registered
+      start = true;
+
+      break;
 
     case isOperator(e):
+      // Only register operator if start is true
       if (start == true) {
-        currSign = btn;
-        if (num1 != undefined) i++;
+        currSign = btn; // Set current sign to the sign pressed
+        if (num1 != undefined || num2 != undefined) i++;
       }
+      // Initilize previous sign to be the current sign
       if (previousSign == undefined) {
         previousSign = currSign;
       }
-      if (currBtn == "num1") {
-        currBtn = "num2";
+      // Switch to the other operand after a sign is registerd only if the previous btn is not an operator
+      // or not "=" sign when num2 is undefind which happens when when entering an number and then pressing and equal sign without
+      // entring num2
+      if (Operator(previousBtn) || (previousBtn == "=" && num2 == undefined)) {
+        break;
       } else {
-        currBtn = "num1";
+        if (currOperand == "num1") {
+          currOperand = "num2";
+        } else {
+          currOperand = "num1";
+        }
       }
+      // Only register the last entered sign
       if (i > 1) {
         if (Operator(previousBtn)) {
           i--;
           break;
         }
+        // Convert num1 to int
         num1 = +num1.join("");
+
+        // Convert num2 to int
         if (typeof num2 == "object") {
           num2 = +num2.join("");
         } else num2 = +num2;
-        result = operate(previousSign, num1, num2);
+
+        result = operate(previousSign, num1, num2); // call the operate function
+
         if (result == Infinity) {
-          input.value = "Wrong number bitch";
+          input.value = "You sneaky bastred"; // Check for division by 0
         } else {
-          input.value = result;
+          input.value = result; // Display the result
         }
-        num1 = [`${result}`];
-        currBtn = "num2";
+
+        num1 = [`${result}`]; // Save result in num1 for later calculations
+        currOperand = "num2"; // Switch back to num2 cuz we changed to num1 above
         i = 1;
       }
 
-      previousSign = btn;
+      previousSign = currSign; // Set previous sign to the the current sign
       break;
 
     case isEqual(e):
+      if (num1 == undefined || num2 == undefined || num1 == 0 || num2 == 0) {
+        break;
+      }
+      // Converet num1 to int
       num1 = +num1.join("");
+
+      // Converet num2 to int
       if (typeof num2 == "object") {
         num2 = +num2.join("");
       } else num2 = +num2;
-      result = operate(currSign, num1, num2);
+
+      result = operate(currSign, num1, num2); // call the operate function
+
       if (result == Infinity) {
-        input.value = "Wrong number bitch";
+        input.value = "Wrong number bitch"; // Check for division by 0
       } else {
-        input.value = result;
+        input.value = result; // Display the result
         num1 = [`${result}`];
         i = 0;
       }
-      currBtn = "num1";
+      // Switch to num1 to start in a clean slate
+      if (num2 != undefined) {
+        currOperand = "num1";
+      }
       break;
 
     case isClear(e):
@@ -144,9 +171,8 @@ function displayResult(e) {
       input.value = 0;
       start = false;
       result = undefined;
-      for (let i = 0; i < arr.length; i++) {
-        arr[i] = undefined;
-      }
+      num1 = [];
+      num2 = [];
       break;
 
     default:
