@@ -1,40 +1,3 @@
-function add(a, b) {
-  return a + b;
-}
-function subtract(a, b) {
-  return a - b;
-}
-function multiply(a, b) {
-  return a * b;
-}
-function divide(a, b) {
-  return a / b;
-}
-function operate(operator, num1, num2) {
-  switch (operator) {
-    case "+":
-      return add(num1, num2);
-    case "-":
-      return subtract(num1, num2);
-    case "x":
-      return multiply(num1, num2);
-    case "/":
-      return divide(num1, num2);
-    default:
-      "sike, that's the wrong number!";
-  }
-}
-const input = document.querySelector("#display");
-const btns = document.querySelectorAll("button");
-
-btns.forEach((btn) => btn.addEventListener("click", displayResult));
-btns.forEach((btn) =>
-  btn.addEventListener("click", function (e) {
-    e.target.classList.add("click");
-    setTimeout(() => this.classList.remove("click"), 120);
-  })
-);
-
 let arr = [];
 let num1 = arr[0];
 let num2 = arr[1];
@@ -45,6 +8,20 @@ let currSign;
 let previousSign;
 let previousBtn;
 let currOperand;
+
+const input = document.querySelector("#display");
+const btns = document.querySelectorAll("button");
+
+// This is where the magic happens
+btns.forEach((btn) => btn.addEventListener("click", displayResult));
+
+// Give a click effect on the btns
+btns.forEach((btn) =>
+  btn.addEventListener("click", function (e) {
+    e.target.classList.add("click");
+    setTimeout(() => this.classList.remove("click"), 120);
+  })
+);
 
 function displayResult(e) {
   let btn = e.target.textContent;
@@ -58,12 +35,10 @@ function displayResult(e) {
         num1 = [];
         currOperand = "num1";
       }
-
       // Save the previousBtn
       if (previousBtn == undefined) {
         previousBtn = btn;
       }
-
       // Check if a digit is entred after a calculation was performed using the = sign to clear old results
       if (previousBtn == "=" && num2 != undefined) {
         num1 = [];
@@ -100,7 +75,10 @@ function displayResult(e) {
       // Switch to the other operand after a sign is registerd only if the previous btn is not an operator
       // or not "=" sign when num2 is undefind which happens when when entering an number and then pressing and equal sign without
       // entring num2
-      if (Operator(previousBtn) || (previousBtn == "=" && num2 == undefined)) {
+      if (
+        isAnOperator(previousBtn) ||
+        (previousBtn == "=" && num2 == undefined)
+      ) {
         break;
       } else {
         if (currOperand == "num1") {
@@ -109,9 +87,10 @@ function displayResult(e) {
           currOperand = "num1";
         }
       }
-      // Only register the last entered sign
+      // Allow for a sequence of operations
       if (i > 1) {
-        if (Operator(previousBtn)) {
+        // Only register the last entered sign
+        if (isAnOperator(previousBtn)) {
           i--;
           break;
         }
@@ -143,16 +122,20 @@ function displayResult(e) {
       if (num1 == undefined || num2 == undefined || num1 == 0 || num2 == 0) {
         break;
       }
-      // Converet num1 to int
+      // Convert num1 to int
       num1 = +num1.join("");
 
-      // Converet num2 to int
+      // Convert num2 to int
       if (typeof num2 == "object") {
         num2 = +num2.join("");
       } else num2 = +num2;
 
       result = operate(currSign, num1, num2); // call the operate function
 
+      // Round result if it has more than 3 digits after decimal point
+      if (!Number.isInteger(result)) {
+        result = result.toFixed(3);
+      }
       if (result == Infinity) {
         input.value = "Wrong number bitch"; // Check for division by 0
       } else {
@@ -165,7 +148,7 @@ function displayResult(e) {
         currOperand = "num1";
       }
       break;
-
+    // Clear then screen and reset all the operands
     case isClear(e):
       i = 0;
       input.value = 0;
@@ -174,72 +157,52 @@ function displayResult(e) {
       num1 = [];
       num2 = [];
       break;
-
-    default:
   }
-  previousBtn = btn;
+  previousBtn = btn; // Set the previousBtn to the current btn
 }
-function Operator(btn) {
-  let operators = ["+", "-", "/", "x"];
-  return operators.includes(btn);
+function add(a, b) {
+  return a + b;
+}
+function subtract(a, b) {
+  return a - b;
+}
+function multiply(a, b) {
+  return a * b;
+}
+function divide(a, b) {
+  return a / b;
+}
+function operate(operator, num1, num2) {
+  switch (operator) {
+    case "+":
+      return add(num1, num2);
+    case "-":
+      return subtract(num1, num2);
+    case "x":
+      return multiply(num1, num2);
+    case "/":
+      return divide(num1, num2);
+    default:
+      "sike, that's the wrong number!";
+  }
 }
 function isDigit(e) {
   let digit = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   return digit.includes(+e.target.textContent);
 }
 function isOperator(e) {
-  let target = e.target.textContent;
-  if (target == "x" || target == "/" || target == "-" || target == "+") {
-    return true;
-  } else {
-    return false;
-  }
+  let operators = ["+", "-", "/", "x"];
+  return operators.includes(e.target.textContent);
 }
 function isEqual(e) {
-  let target = e.target.textContent;
-  if (target == "=") {
-    return true;
-  } else {
-    return false;
-  }
+  let equalSign = ["="];
+  return equalSign.includes(e.target.textContent);
 }
 function isClear(e) {
-  let target = e.target.textContent;
-  if (target == "C" || target == "Del" || target == ".") {
-    return true;
-  } else {
-    return false;
-  }
+  let C = ["C"];
+  return C.includes(e.target.textContent);
 }
-// 1- press any digit
-// 2- display digit
-// 3- press an operator
-// don't allow for another operator
-// 4- press another digit
-// 5- display digit
-// don't allow for another operator
-
-// 6-
-
-// if ( "=" ) is pressed:
-// calculate the result
-// replace the curr screen with the result
-// do not display the "=" sign
-// after that
-// if operator is pressed go to next
-// or if a digit is pressed
-// clear screen
-// display digit(s)
-// go to step 2
-
-// if ( operator ) is pressed:
-// disable all other operators
-// calculate the perevious result
-// replace the perevious screen with the result
-// wait for another digit
-// replace the screen with the new digit but keep the previous result
-// calculate the new results with the new digit
-// if "=" calculate and display
-// do not display the "=" sign
-// else if another opertor is pressed
-// go to step 1
+function isAnOperator(btn) {
+  let operators = ["+", "-", "/", "x"];
+  return operators.includes(btn);
+}
