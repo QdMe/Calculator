@@ -8,7 +8,7 @@ let currSign;
 let previousSign;
 let previousBtn;
 let currOperand;
-
+let allowDecimal = true;
 const input = document.querySelector("#display");
 const btns = document.querySelectorAll("button");
 
@@ -26,7 +26,7 @@ btns.forEach((btn) =>
 function displayResult(e) {
   let btn = e.target.textContent;
   switch (true) {
-    case isDigit(e):
+    case isDigit(e) || isDecimalPoint(e):
       // Check if "0" is entered in a clean screen so it's not registered
       if (btn == "0" && start == false) {
         break;
@@ -39,7 +39,7 @@ function displayResult(e) {
       if (previousBtn == undefined) {
         previousBtn = btn;
       }
-      // Check if a digit is entred after a calculation was performed using the = sign to clear old results
+      // Clear old results after a calculation is performed using the = sign
       if (previousBtn == "=" && num2 != undefined) {
         num1 = [];
         num2 = [];
@@ -48,6 +48,17 @@ function displayResult(e) {
       // Reset the second operand if a digit is entered right after a sign was entered
       if (previousBtn == currSign) {
         num2 = [];
+      }
+      // Decimal point handling
+      if (isDecimalPoint(e)) {
+        if (allowDecimal == true) allowDecimal = false;
+        else {
+          break;
+        }
+      }
+      // Zeros in a row on an empty display handling
+      if (input.value == 0 && btn == "0" && previousBtn == "0") {
+        break;
       }
       // Displaying the digits depending on the value of the currOperand
       if (currOperand == "num1") {
@@ -83,6 +94,7 @@ function displayResult(e) {
       } else {
         if (currOperand == "num1") {
           currOperand = "num2";
+          allowDecimal = true;
         } else {
           currOperand = "num1";
         }
@@ -103,7 +115,10 @@ function displayResult(e) {
         } else num2 = +num2;
 
         result = operate(previousSign, num1, num2); // call the operate function
-
+        // Round result if it has more than 3 digits after decimal point
+        if (!Number.isInteger(result)) {
+          result = result.toFixed(1);
+        }
         if (result == Infinity) {
           input.value = "You sneaky bastred"; // Check for division by 0
         } else {
@@ -119,7 +134,12 @@ function displayResult(e) {
       break;
 
     case isEqual(e):
-      if (num1 == undefined || num2 == undefined || num1 == 0 || num2 == 0) {
+      if (
+        num1 == undefined ||
+        num2 == undefined ||
+        num1[0] == undefined ||
+        num2[0] == undefined
+      ) {
         break;
       }
       // Convert num1 to int
@@ -134,7 +154,7 @@ function displayResult(e) {
 
       // Round result if it has more than 3 digits after decimal point
       if (!Number.isInteger(result)) {
-        result = result.toFixed(3);
+        result = result.toFixed(1);
       }
       if (result == Infinity) {
         input.value = "Wrong number bitch"; // Check for division by 0
@@ -146,6 +166,7 @@ function displayResult(e) {
       // Switch to num1 to start in a clean slate
       if (num2 != undefined) {
         currOperand = "num1";
+        allowDecimal = true;
       }
       break;
     // Clear then screen and reset all the operands
@@ -169,12 +190,12 @@ function displayResult(e) {
         num2.pop();
         input.value = num2.join("");
       }
-    // Delete from display
-    // if num1 delete and update
-    // if num2 delete and update
-    // if result delete and update num2
   }
   previousBtn = btn; // Set the previousBtn to the current btn
+}
+function isDecimalPoint(e) {
+  let point = ["."];
+  return point.includes(e.target.textContent);
 }
 function isDel(e) {
   let del = ["Del"];
