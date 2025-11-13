@@ -157,8 +157,28 @@ function displayResult(e) {
       num1 = [];
       num2 = [];
       break;
+
+    case isDel(e):
+      if (currOperand == "num1" && input.value != undefined) {
+        if (result != undefined) {
+          num1 = num1[0].split("");
+        }
+        num1.pop();
+        input.value = num1.join("");
+      } else if (currOperand == "num2" && input.value != undefined) {
+        num2.pop();
+        input.value = num2.join("");
+      }
+    // Delete from display
+    // if num1 delete and update
+    // if num2 delete and update
+    // if result delete and update num2
   }
   previousBtn = btn; // Set the previousBtn to the current btn
+}
+function isDel(e) {
+  let del = ["Del"];
+  return del.includes(e.target.textContent);
 }
 function add(a, b) {
   return a + b;
