@@ -19,7 +19,7 @@ btns.forEach((btn) => btn.addEventListener("click", displayResult));
 btns.forEach((btn) =>
   btn.addEventListener("click", function (e) {
     e.target.classList.add("click");
-    setTimeout(() => this.classList.remove("click"), 120);
+    setTimeout(() => this.classList.remove("click"), 70);
   })
 );
 
@@ -177,6 +177,8 @@ function displayResult(e) {
       result = undefined;
       num1 = [];
       num2 = [];
+      currOperand = "num1";
+      allowDecimal = true;
       break;
 
     case isDel(e):
